@@ -1071,7 +1071,7 @@ func (q *Query) GetStatsLabelsAddGroupingByTime(step, offset int64) ([]string, e
 	// do not modify or delete the `_time` field, since it is required for bucketing by step.
 	// For instant stats (step == 0), allow such pipes for broader query flexibility.
 	if step > 0 {
-		for i := 0; i < idx; i++ {
+		for i := range idx {
 			p := q.pipes[i]
 			if _, ok := p.(*pipeStats); ok {
 				// Skip `stats` pipe, since it is updated with the grouping by `_time` in the addByTimeFieldToStatsPipes() below.
@@ -3065,7 +3065,7 @@ func startsWithYear(s string) bool {
 	if len(s) < 4 {
 		return false
 	}
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		c := s[i]
 		if c < '0' || c > '9' {
 			return false
