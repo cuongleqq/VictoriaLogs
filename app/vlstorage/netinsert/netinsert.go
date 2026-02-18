@@ -321,7 +321,7 @@ var zstdBufPool bytesutil.ByteBufferPool
 // Call MustStop on the returned storage when it is no longer needed.
 func NewStorage(addrs []string, authCfgs []*promauth.Config, isTLSs []bool, concurrency int, disableCompression bool) *Storage {
 	pendingDataBuffers := make(chan *bytesutil.ByteBuffer, concurrency*len(addrs))
-	for i := 0; i < cap(pendingDataBuffers); i++ {
+	for range cap(pendingDataBuffers) {
 		pendingDataBuffers <- &bytesutil.ByteBuffer{}
 	}
 
