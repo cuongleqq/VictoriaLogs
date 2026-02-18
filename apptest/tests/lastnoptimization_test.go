@@ -34,10 +34,7 @@ func TestVlsingleLastnOptimization(t *testing.T) {
 		for limit := 1; limit <= 2*len(ingestRecords); limit++ {
 			var logLines []string
 
-			wantLinesCount := limit
-			if wantLinesCount > len(ingestRecords) {
-				wantLinesCount = len(ingestRecords)
-			}
+			wantLinesCount := min(limit, len(ingestRecords))
 			for i := 0; i < wantLinesCount; i++ {
 				logLines = append(logLines, ingestRecords[i])
 			}
