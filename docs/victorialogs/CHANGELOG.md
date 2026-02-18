@@ -27,6 +27,7 @@ according to the following docs:
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): add support for resizing and reordering columns in Table View. See [#76](https://github.com/VictoriaMetrics/VictoriaLogs/issues/76) and [#714](https://github.com/VictoriaMetrics/VictoriaLogs/issues/714).
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): improve group view readability with zebra rows. See [#1058](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1058).
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): add `none` option for hit chart grouping and set it as the default. See [#1086](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1086).
+* FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): add stream fields chips to the Log context modal. See [#1065](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1065).
 
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): fix markdown parsing for log lines starting with tabs in group view.
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): fix timestamp rendering according to the selected timezone. See [#63](https://github.com/VictoriaMetrics/VictoriaLogs/issues/63).
