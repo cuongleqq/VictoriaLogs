@@ -232,7 +232,7 @@ var runID = toUUID(rand.Uint64(), rand.Uint64())
 func generateLogsAtTimestamp(bw *bufio.Writer, workerID int, ts int64, firstStreamID, activeStreams int) {
 	streamID := firstStreamID
 	timeStr := toRFC3339(ts)
-	for i := 0; i < activeStreams; i++ {
+	for range activeStreams {
 		ip := toIPv4(rand.Uint32())
 		uuid := toUUID(rand.Uint64(), rand.Uint64())
 		fmt.Fprintf(bw, `{"_time":"%s","_msg":"message for the stream %d and worker %d; ip=%s; uuid=%s; u64=%d","host":"host_%d","worker_id":"%d"`,
