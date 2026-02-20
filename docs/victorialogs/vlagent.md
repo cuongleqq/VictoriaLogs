@@ -158,7 +158,7 @@ Supported metadata fields:
 - `kubernetes.pod_ip` - IP address assigned to the pod.
 - `kubernetes.container_id` - ID of the container in the runtime.
 - `kubernetes.pod_labels.*` - any Pod label (e.g., `kubernetes.pod_labels.app`).
-- `kubernetes.pod_annotations.*` - any Pod annotation (e.g., `kubernetes.pod_annotation.logging.vlagent.io/exclude`).
+- `kubernetes.pod_annotations.*` - any Pod annotation (e.g., `kubernetes.pod_annotations.logging.vlagent.io/exclude`).
 - `kubernetes.node_labels.*` - any Node label (e.g., `kubernetes.io/arch`).
 - `kubernetes.node_annotations.*` - any Node annotation (e.g., `disk-type.gke.io/pd-ssd`).
 
