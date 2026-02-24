@@ -22,9 +22,10 @@ according to the following docs:
 
 ## tip
 
+* FEATURE: [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/): allow using `total_stats by (...)` with fields that are a subset of labels produced by the preceding `stats` pipe in [`/select/logsql/stats_query`](https://docs.victoriametrics.com/victorialogs/querying/#querying-log-stats) and [`/select/logsql/stats_query_range`](https://docs.victoriametrics.com/victorialogs/querying/#querying-log-range-stats). See [#1088](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1088).
+
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): fix autocomplete popper positioning. The regression has been introduced in [v1.46.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.46.0).
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): fix select dropdown width. The regression has been introduced in [v1.46.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.46.0).
-
 
 ## [v1.46.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.46.0)
 
