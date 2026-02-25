@@ -2028,6 +2028,20 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`* | row_Min(foo)`, `* | stats row_min(foo) as "row_min(foo)"`)
 	f(`* | stats BY(x, y, ) row_MIN(foo,bar,) bar`, `* | stats by (x, y) row_min(foo, bar) as bar`)
 
+	// stats pipe field_max
+	f(`* | stats field_Max(foo,x) bar`, `* | stats field_max(foo, x) as bar`)
+	f(`* | field_Max(foo,x)`, `* | stats field_max(foo, x) as "field_max(foo, x)"`)
+	f(`* | stats BY(x, y, ) field_MAX(foo,bar) bar`, `* | stats by (x, y) field_max(foo, bar) as bar`)
+
+	// stats pipe field_min
+	f(`* | stats field_Min(foo,x) bar`, `* | stats field_min(foo, x) as bar`)
+	f(`* | field_Min(foo,x)`, `* | stats field_min(foo, x) as "field_min(foo, x)"`)
+	f(`* | stats BY(x, y, ) field_MIN(foo,bar) bar`, `* | stats by (x, y) field_min(foo, bar) as bar`)
+
+	// stats pipe any
+	f(`* | stats Any(foo) bar`, `* | stats any(foo) as bar`)
+	f(`* | stats BY(x, y, ) ANY(foo) bar`, `* | stats by (x, y) any(foo) as bar`)
+
 	// stats pipe avg
 	f(`* | stats Avg(foo) bar`, `* | stats avg(foo) as bar`)
 	f(`* | stats BY(x, y, ) AVG(foo,bar,) bar`, `* | stats by (x, y) avg(foo, bar) as bar`)
@@ -2856,6 +2870,23 @@ func TestParseQuery_Failure(t *testing.T) {
 
 	// invalid stats min
 	f(`foo | stats row_min`)
+
+	// invalid stats any
+	f(`foo | stats any`)
+	f(`foo | stats any()`)
+	f(`foo | stats any(foo, bar)`)
+
+	// invalid stats field_max
+	f(`foo | stats field_max`)
+	f(`foo | stats field_max()`)
+	f(`foo | stats field_max(foo)`)
+	f(`foo | stats field_max(foo, bar, baz)`)
+
+	// invalid stats field_min
+	f(`foo | stats field_min`)
+	f(`foo | stats field_min()`)
+	f(`foo | stats field_min(foo)`)
+	f(`foo | stats field_min(foo, bar, baz)`)
 
 	// invalid stats avg
 	f(`foo | stats avg`)

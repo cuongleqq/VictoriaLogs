@@ -5,35 +5,34 @@ import (
 	"testing"
 )
 
-func TestParseStatsRowAnySuccess(t *testing.T) {
+func TestParseStatsAnySuccess(t *testing.T) {
 	f := func(pipeStr string) {
 		t.Helper()
 		expectParseStatsFuncSuccess(t, pipeStr)
 	}
 
-	f(`row_any(*)`)
-	f(`row_any(foo)`)
-	f(`row_any(foo, bar)`)
-	f(`row_any(foo*, bar)`)
+	f(`any(foo)`)
 }
 
-func TestParseStatsRowAnyFailure(t *testing.T) {
+func TestParseStatsAnyFailure(t *testing.T) {
 	f := func(pipeStr string) {
 		t.Helper()
 		expectParseStatsFuncFailure(t, pipeStr)
 	}
 
-	f(`row_any`)
-	f(`row_any(x) bar`)
+	f(`any`)
+	f(`any()`)
+	f(`any(x) bar`)
+	f(`any(x, y)`)
 }
 
-func TestStatsRowAny(t *testing.T) {
+func TestStatsAny(t *testing.T) {
 	f := func(pipeStr string, rows, rowsExpected [][]Field) {
 		t.Helper()
 		expectPipeResults(t, pipeStr, rows, rowsExpected)
 	}
 
-	f("row_any()", [][]Field{
+	f("any(a)", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -41,11 +40,11 @@ func TestStatsRowAny(t *testing.T) {
 		},
 	}, [][]Field{
 		{
-			{"row_any(*)", `{"_msg":"abc","a":"2","b":"3"}`},
+			{"any(a)", `2`},
 		},
 	})
 
-	f("stats row_any(a) as x", [][]Field{
+	f("stats any(_msg) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -53,23 +52,11 @@ func TestStatsRowAny(t *testing.T) {
 		},
 	}, [][]Field{
 		{
-			{"x", `{"a":"2"}`},
+			{"x", `abc`},
 		},
 	})
 
-	f("stats row_any(a, x, b) as x", [][]Field{
-		{
-			{"_msg", `abc`},
-			{"a", `2`},
-			{"b", `3`},
-		},
-	}, [][]Field{
-		{
-			{"x", `{"a":"2","b":"3"}`},
-		},
-	})
-
-	f("stats row_any(a) if (b:'') as x", [][]Field{
+	f("stats any(a) if (b:'') as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -81,11 +68,11 @@ func TestStatsRowAny(t *testing.T) {
 		},
 	}, [][]Field{
 		{
-			{"x", `{"a":"1"}`},
+			{"x", `1`},
 		},
 	})
 
-	f("stats by (b) row_any(a) if (b:*) as x", [][]Field{
+	f("stats by (b) any(a) if (b:*) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -98,15 +85,15 @@ func TestStatsRowAny(t *testing.T) {
 	}, [][]Field{
 		{
 			{"b", "3"},
-			{"x", `{"a":"2"}`},
+			{"x", `2`},
 		},
 		{
 			{"b", ""},
-			{"x", `{}`},
+			{"x", ``},
 		},
 	})
 
-	f("stats by (a) row_any(b) as x", [][]Field{
+	f("stats by (a) any(b) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `1`},
@@ -119,15 +106,15 @@ func TestStatsRowAny(t *testing.T) {
 	}, [][]Field{
 		{
 			{"a", "1"},
-			{"x", `{"b":"3"}`},
+			{"x", `3`},
 		},
 		{
 			{"a", "3"},
-			{"x", `{"b":"5"}`},
+			{"x", `5`},
 		},
 	})
 
-	f("stats by (a) row_any(c) as x", [][]Field{
+	f("stats by (a) any(c) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `1`},
@@ -140,15 +127,15 @@ func TestStatsRowAny(t *testing.T) {
 	}, [][]Field{
 		{
 			{"a", "1"},
-			{"x", `{}`},
+			{"x", ``},
 		},
 		{
 			{"a", "3"},
-			{"x", `{"c":"foo"}`},
+			{"x", `foo`},
 		},
 	})
 
-	f("stats by (a, b) row_any(c) as x", [][]Field{
+	f("stats by (a, b) any(c) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `1`},
@@ -168,23 +155,23 @@ func TestStatsRowAny(t *testing.T) {
 		{
 			{"a", "1"},
 			{"b", "3"},
-			{"x", `{}`},
+			{"x", ``},
 		},
 		{
 			{"a", "1"},
 			{"b", ""},
-			{"x", `{"c":"foo"}`},
+			{"x", `foo`},
 		},
 		{
 			{"a", "3"},
 			{"b", "5"},
-			{"x", `{"c":"4"}`},
+			{"x", `4`},
 		},
 	})
 }
 
-func TestStatsRowAny_ExportImportState(t *testing.T) {
-	f := func(sap *statsRowAnyProcessor, dataLenExpected int) {
+func TestStatsAny_ExportImportState(t *testing.T) {
+	f := func(sap *statsAnyProcessor, dataLenExpected int) {
 		t.Helper()
 
 		data := sap.exportState(nil, nil)
@@ -193,7 +180,7 @@ func TestStatsRowAny_ExportImportState(t *testing.T) {
 			t.Fatalf("unexpected dataLen; got %d; want %d", dataLen, dataLenExpected)
 		}
 
-		var sap2 statsRowAnyProcessor
+		var sap2 statsAnyProcessor
 		_, err := sap2.importState(data, nil)
 		if err != nil {
 			t.Fatalf("unexpected error: %s", err)
@@ -204,23 +191,14 @@ func TestStatsRowAny_ExportImportState(t *testing.T) {
 		}
 	}
 
-	var sap statsRowAnyProcessor
+	var sap statsAnyProcessor
 
 	// zero state
 	f(&sap, 1)
 
 	// non-zero state
-	sap = statsRowAnyProcessor{
-		fields: []Field{
-			{
-				Name:  "foo",
-				Value: "bar",
-			},
-			{
-				Name:  "abc",
-				Value: "de",
-			},
-		},
+	sap = statsAnyProcessor{
+		value: "foobar",
 	}
-	f(&sap, 16)
+	f(&sap, 7)
 }

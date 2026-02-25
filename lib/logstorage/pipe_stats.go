@@ -1368,11 +1368,14 @@ func getStatsFuncParsers() map[string]statsFuncParser {
 
 func initStatsFuncParsers() {
 	statsFuncParsers = map[string]statsFuncParser{
+		"any":             parseStatsAny,
 		"avg":             parseStatsAvg,
 		"count":           parseStatsCount,
 		"count_empty":     parseStatsCountEmpty,
 		"count_uniq":      parseStatsCountUniq,
 		"count_uniq_hash": parseStatsCountUniqHash,
+		"field_max":       parseStatsFieldMax,
+		"field_min":       parseStatsFieldMin,
 		"histogram":       parseStatsHistogram,
 		"json_values":     parseStatsJSONValues,
 		"max":             parseStatsMax,

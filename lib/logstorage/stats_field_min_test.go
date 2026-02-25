@@ -5,34 +5,34 @@ import (
 	"testing"
 )
 
-func TestParseStatsFieldMaxSuccess(t *testing.T) {
+func TestParseStatsFieldMinSuccess(t *testing.T) {
 	f := func(pipeStr string) {
 		t.Helper()
 		expectParseStatsFuncSuccess(t, pipeStr)
 	}
 
-	f(`field_max(foo, bar)`)
+	f(`field_min(foo, bar)`)
 }
 
-func TestParseStatsFieldMaxFailure(t *testing.T) {
+func TestParseStatsFieldMinFailure(t *testing.T) {
 	f := func(pipeStr string) {
 		t.Helper()
 		expectParseStatsFuncFailure(t, pipeStr)
 	}
 
-	f(`field_max`)
-	f(`field_max()`)
-	f(`field_max(x)`)
-	f(`field_max(x, y, z)`)
+	f(`field_min`)
+	f(`field_min()`)
+	f(`field_min(x)`)
+	f(`field_min(x, y, z)`)
 }
 
-func TestStatsFieldMax(t *testing.T) {
+func TestStatsFieldMin(t *testing.T) {
 	f := func(pipeStr string, rows, rowsExpected [][]Field) {
 		t.Helper()
 		expectPipeResults(t, pipeStr, rows, rowsExpected)
 	}
 
-	f("stats field_max(b, a) as x", [][]Field{
+	f("stats field_min(b, a) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -48,11 +48,11 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 	}, [][]Field{
 		{
-			{"x", `3`},
+			{"x", `2`},
 		},
 	})
 
-	f("stats field_max(foo, a) as x", [][]Field{
+	f("stats field_min(foo, a) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -72,7 +72,7 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 	})
 
-	f("stats field_max(b, a) as x", [][]Field{
+	f("stats field_min(b, a) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -89,11 +89,11 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 	}, [][]Field{
 		{
-			{"x", `3`},
+			{"x", `2`},
 		},
 	})
 
-	f("stats field_max(a, b) if (b:*) as x", [][]Field{
+	f("stats field_min(a, b) if (b:*) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -109,11 +109,11 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 	}, [][]Field{
 		{
-			{"x", `54`},
+			{"x", `3`},
 		},
 	})
 
-	f("stats by (b) field_max(a, b) if (b:*) as x", [][]Field{
+	f("stats by (b) field_min(a, b) if (b:*) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `2`},
@@ -139,7 +139,7 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 	})
 
-	f("stats by (a) field_max(b, b) as x", [][]Field{
+	f("stats by (a) field_min(b, b) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `1`},
@@ -164,11 +164,11 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 		{
 			{"a", "3"},
-			{"x", `7`},
+			{"x", `5`},
 		},
 	})
 
-	f("stats by (a) field_max(c, a) as x", [][]Field{
+	f("stats by (a) field_min(c, a) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `1`},
@@ -197,7 +197,7 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 	})
 
-	f("stats by (a) field_max(b, c) as x", [][]Field{
+	f("stats by (a) field_min(b, c) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `1`},
@@ -224,11 +224,11 @@ func TestStatsFieldMax(t *testing.T) {
 		},
 		{
 			{"a", "3"},
-			{"x", ``},
+			{"x", `foo`},
 		},
 	})
 
-	f("stats by (a, b) field_max(c,a) as x", [][]Field{
+	f("stats by (a, b) field_min(c,a) as x", [][]Field{
 		{
 			{"_msg", `abc`},
 			{"a", `1`},
@@ -263,8 +263,8 @@ func TestStatsFieldMax(t *testing.T) {
 	})
 }
 
-func TestStatsFieldMax_ExportImportState(t *testing.T) {
-	f := func(smp *statsFieldMaxProcessor, dataLenExpected int) {
+func TestStatsFieldMin_ExportImportState(t *testing.T) {
+	f := func(smp *statsFieldMinProcessor, dataLenExpected int) {
 		t.Helper()
 
 		data := smp.exportState(nil, nil)
@@ -273,7 +273,7 @@ func TestStatsFieldMax_ExportImportState(t *testing.T) {
 			t.Fatalf("unexpected dataLen; got %d; want %d", dataLen, dataLenExpected)
 		}
 
-		var smp2 statsFieldMaxProcessor
+		var smp2 statsFieldMinProcessor
 		_, err := smp2.importState(data, nil)
 		if err != nil {
 			t.Fatalf("unexpected error: %s", err)
@@ -284,14 +284,14 @@ func TestStatsFieldMax_ExportImportState(t *testing.T) {
 		}
 	}
 
-	var smp statsFieldMaxProcessor
+	var smp statsFieldMinProcessor
 
 	// zero state
 	f(&smp, 2)
 
 	// non-zero state
-	smp = statsFieldMaxProcessor{
-		max:   "abcded",
+	smp = statsFieldMinProcessor{
+		min:   "abcded",
 		value: "ilojoerDSF",
 	}
 	f(&smp, 18)
