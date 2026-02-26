@@ -161,12 +161,17 @@ func (kc *kubernetesCollector) watchForPodsUpdates(ctx context.Context, resource
 			continue
 		}
 
+		readEventsStart := time.Now()
 		err = r.readEvents(handleEvent)
+		took := time.Since(readEventsStart)
 		_ = r.close()
 		if err != nil {
 			if ctx.Err() != nil {
 				return
 			}
+
+			logger.Infof("readEvents took %s, error is %T (%s)", took, err, err)
+			logErrorChain(err)
 
 			isEOF := errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF)
 			if isEOF && time.Since(lastEOF) > time.Minute {
@@ -174,6 +179,7 @@ func (kc *kubernetesCollector) watchForPodsUpdates(ctx context.Context, resource
 				// This is expected to happen from time to time.
 				// Ignore EOF errors happening not more often than once per minute.
 				lastEOF = time.Now()
+				logger.Errorf("ignoring EOF error from Kubernetes API: %s", err)
 				continue
 			}
 
@@ -183,6 +189,13 @@ func (kc *kubernetesCollector) watchForPodsUpdates(ctx context.Context, resource
 			bt.wait(stopCh)
 			continue
 		}
+	}
+}
+
+func logErrorChain(err error) {
+	for i := 0; err != nil; i++ {
+		logger.Infof("err chain [%d]: %s (type: %T)", i, err, err)
+		err = errors.Unwrap(err)
 	}
 }
 
