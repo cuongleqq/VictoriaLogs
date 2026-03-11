@@ -22,6 +22,10 @@ according to the following docs:
 
 ## tip
 
+## [v1.48.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.48.0)
+
+Released at 2026-03-11
+
 * SECURITY: upgrade Go builder from Go1.26.0 to Go1.26.1. See [the list of issues addressed in Go1.26.1](https://github.com/golang/go/issues?q=milestone%3AGo1.26.1%20label%3ACherryPickApproved).
 
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): add a sidebar for quick filtering by log stream fields and values. See [#1084](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1084).
