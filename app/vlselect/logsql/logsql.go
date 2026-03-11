@@ -71,14 +71,10 @@ func ProcessQueryTimeRangeRequest(ctx context.Context, w http.ResponseWriter, r 
 }
 
 func parseQueryTimeRangeArgs(r *http.Request) (int64, int64, bool, error) {
-	qStr := r.FormValue("query")
-	if qStr == "" {
-		return 0, 0, false, fmt.Errorf("`query` arg cannot be empty")
-	}
 	currTimestamp := time.Now().UnixNano()
-	q, err := logstorage.ParseQueryAtTimestamp(qStr, currTimestamp)
+	q, err := parseQueryFromRequest(r, currTimestamp)
 	if err != nil {
-		return 0, 0, false, fmt.Errorf("cannot parse query [%s]: %s", qStr, err)
+		return 0, 0, false, err
 	}
 
 	minTimestamp, maxTimestamp := q.GetFilterTimeRange()
@@ -106,6 +102,21 @@ func parseQueryTimeRangeArgs(r *http.Request) (int64, int64, bool, error) {
 	}
 
 	return minTimestamp, maxTimestamp, hasTimeFilter, nil
+}
+
+func parseQueryFromRequest(r *http.Request, timestamp int64) (*logstorage.Query, error) {
+	qStr := r.FormValue("query")
+	if qStr == "" {
+		return nil, fmt.Errorf("`query` arg cannot be empty")
+	}
+	if len(qStr) > maxQueryLen.IntN() {
+		return nil, fmt.Errorf("the `query` arg length cannot exceed -search.maxQueryLen=%d bytes; the current query length is %d bytes; query=%s", maxQueryLen.IntN(), len(qStr), qStr)
+	}
+	q, err := logstorage.ParseQueryAtTimestamp(qStr, timestamp)
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse `query` arg: %w; query=%s", err, qStr)
+	}
+	return q, nil
 }
 
 func timestampToRFC3339Nano(nsec int64) string {
@@ -1473,13 +1484,9 @@ func parseCommonArgsWithConfig(r *http.Request, skipMaxRangeCheck bool) (*common
 	}
 
 	// Parse query
-	qStr := r.FormValue("query")
-	if len(qStr) > maxQueryLen.IntN() {
-		return nil, fmt.Errorf("the query length cannot exceed -search.maxQueryLen=%d bytes; the current query length is %d bytes", maxQueryLen.IntN(), len(qStr))
-	}
-	q, err := logstorage.ParseQueryAtTimestamp(qStr, timestamp)
+	q, err := parseQueryFromRequest(r, timestamp)
 	if err != nil {
-		return nil, fmt.Errorf("cannot parse query [%s]: %s", qStr, err)
+		return nil, err
 	}
 
 	if startOK || endOK {
