@@ -484,6 +484,9 @@ func (lr *LogRows) addFieldsInternal(fields []Field, ignoreFields, decolorizeFie
 		if f.Name == "_time" {
 			// Values for the _time field are stored in lr.timestamps
 			// See https://github.com/VictoriaMetrics/VictoriaLogs/issues/1168
+			line := MarshalFieldsToJSON(nil, fields)
+			unexpectedTimeFieldLogger.Warnf("skipping _time field with the value %q because the timestamp is parsed from another field "+
+				"according to https://docs.victoriametrics.com/victorialogs/data-ingestion/#http-parameters ; log entry: %s", f.Value, line)
 			continue
 		}
 
@@ -529,6 +532,8 @@ func (lr *LogRows) addFieldsInternal(fields []Field, ignoreFields, decolorizeFie
 
 	return hasMsgField
 }
+
+var unexpectedTimeFieldLogger = logger.WithThrottler("unexpected_time_field", 5*time.Second)
 
 func getCanonicalFieldName(fieldName string) string {
 	if fieldName == "_msg" {
