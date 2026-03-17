@@ -325,11 +325,16 @@ func runPipes(qctx *QueryContext, pipes []pipe, search searchFunc, writeBlock wr
 }
 
 // GetFieldNames returns field names for the given qctx.
-func (s *Storage) GetFieldNames(qctx *QueryContext) ([]ValueWithHits, error) {
+//
+// If the filter is non-empty, then only the field names containing the filter substring are returned.
+func (s *Storage) GetFieldNames(qctx *QueryContext, filter string) ([]ValueWithHits, error) {
 	q := qctx.Query
 
 	pipes := append([]pipe{}, q.pipes...)
 	pipeStr := "field_names"
+	if filter != "" {
+		pipeStr += " filter " + quoteTokenIfNeeded(filter)
+	}
 	lex := newLexer(pipeStr, q.timestamp)
 
 	p, err := parsePipeFieldNames(lex)

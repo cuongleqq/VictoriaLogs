@@ -565,11 +565,13 @@ func RunQuery(qctx *logstorage.QueryContext, writeBlock logstorage.WriteDataBloc
 }
 
 // GetFieldNames executes qctx and returns field names seen in results.
-func GetFieldNames(qctx *logstorage.QueryContext) ([]logstorage.ValueWithHits, error) {
+//
+// If the filter isn't empty, then only the field names containing the filter substing are returned.
+func GetFieldNames(qctx *logstorage.QueryContext, filter string) ([]logstorage.ValueWithHits, error) {
 	if localStorage != nil {
-		return localStorage.GetFieldNames(qctx)
+		return localStorage.GetFieldNames(qctx, filter)
 	}
-	return netstorageSelect.GetFieldNames(qctx)
+	return netstorageSelect.GetFieldNames(qctx, filter)
 }
 
 // GetFieldValues executes the given qctx and returns unique values for the fieldName seen in results.

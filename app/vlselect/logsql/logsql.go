@@ -434,12 +434,15 @@ func ProcessFieldNamesRequest(ctx context.Context, w http.ResponseWriter, r *htt
 		return
 	}
 
+	// filter is used for filtering the returned field names
+	filter := r.FormValue("filter")
+
 	qctx := ca.newQueryContext(ctx)
 	defer ca.updatePerQueryStatsMetrics()
 
 	// Obtain field names for the given query
 	startTime := time.Now()
-	fieldNames, err := vlstorage.GetFieldNames(qctx)
+	fieldNames, err := vlstorage.GetFieldNames(qctx, filter)
 	if err != nil {
 		httpserver.Errorf(w, r, "cannot obtain field names: %s", err)
 		return

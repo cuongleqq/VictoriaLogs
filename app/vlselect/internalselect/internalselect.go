@@ -188,10 +188,12 @@ func processFieldNamesRequest(ctx context.Context, w http.ResponseWriter, r *htt
 		return err
 	}
 
+	filter := r.FormValue("filter")
+
 	qctx := cp.NewQueryContext(ctx)
 	defer cp.UpdatePerQueryStatsMetrics()
 
-	fieldNames, err := vlstorage.GetFieldNames(qctx)
+	fieldNames, err := vlstorage.GetFieldNames(qctx, filter)
 	if err != nil {
 		return fmt.Errorf("cannot obtain field names: %w", err)
 	}

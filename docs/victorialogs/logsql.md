@@ -2225,6 +2225,13 @@ For example, the following query returns all the field names with the number of 
 _time:5m | field_names
 ```
 
+It is possible to return only the field names containing the given substring by using `filter "substring"` modifier. For example, the following query
+returns only field names containing `kubernetes` substring across all the logs over the last 5 minutes:
+
+```logsql
+_time:5m | field_names filter "kubernetes"
+```
+
 Field names are returned in arbitrary order. Use [`sort` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#sort-pipe) in order to sort them if needed.
 
 See also:

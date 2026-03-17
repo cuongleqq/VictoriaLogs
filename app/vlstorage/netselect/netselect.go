@@ -203,8 +203,9 @@ func (sn *storageNode) runQuery(qctx *logstorage.QueryContext, processBlock func
 	}
 }
 
-func (sn *storageNode) getFieldNames(qctx *logstorage.QueryContext) ([]logstorage.ValueWithHits, error) {
+func (sn *storageNode) getFieldNames(qctx *logstorage.QueryContext, filter string) ([]logstorage.ValueWithHits, error) {
 	args := sn.getCommonArgs(FieldNamesProtocolVersion, qctx)
+	args.Set("filter", filter)
 
 	return sn.getValuesWithHits(qctx, "/internal/select/field_names", args)
 }
@@ -421,10 +422,10 @@ func (s *Storage) runQuery(stopCh <-chan struct{}, qctx *logstorage.QueryContext
 }
 
 // GetFieldNames executes qctx and returns field names seen in results.
-func (s *Storage) GetFieldNames(qctx *logstorage.QueryContext) ([]logstorage.ValueWithHits, error) {
+func (s *Storage) GetFieldNames(qctx *logstorage.QueryContext, filter string) ([]logstorage.ValueWithHits, error) {
 	return s.getValuesWithHits(qctx, 0, false, func(ctx context.Context, sn *storageNode) ([]logstorage.ValueWithHits, error) {
 		qctxLocal := qctx.WithContext(ctx)
-		return sn.getFieldNames(qctxLocal)
+		return sn.getFieldNames(qctxLocal, filter)
 	})
 }
 

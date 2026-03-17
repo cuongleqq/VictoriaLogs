@@ -979,6 +979,8 @@ Below is an example JSON output returned from this endpoint:
 }
 ```
 
+Pass `filter=substring` query arg to `/select/logsql/field_names` in order to return only the field names containing the given `substring`.
+
 Pass `ignore_pipes=1` query arg to `/select/logsql/field_names` in order to ignore pipes from the `query` while obtaining the field names to return.
 
 By default the `(AccountID=0, ProjectID=0)` [tenant](https://docs.victoriametrics.com/victorialogs/#multitenancy) is queried.

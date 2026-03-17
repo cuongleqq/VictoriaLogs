@@ -38,6 +38,7 @@ func (qos *QueryOpts) asURLValues() url.Values {
 type FieldNamesOpts struct {
 	Start       string
 	End         string
+	Filter      string
 	IgnorePipes string
 }
 
@@ -45,6 +46,7 @@ func (fos *FieldNamesOpts) asURLValues() url.Values {
 	uv := make(url.Values)
 	addNonEmpty(uv, "start", fos.Start)
 	addNonEmpty(uv, "end", fos.End)
+	addNonEmpty(uv, "filter", fos.Filter)
 	addNonEmpty(uv, "ignore_pipes", fos.IgnorePipes)
 	return uv
 }
