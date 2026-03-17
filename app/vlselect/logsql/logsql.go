@@ -516,14 +516,17 @@ func ProcessStreamFieldNamesRequest(ctx context.Context, w http.ResponseWriter, 
 		return
 	}
 
+	// Filter is used for filtering the returned field names by the given filter substring
+	filter := r.FormValue("filter")
+
 	qctx := ca.newQueryContext(ctx)
 	defer ca.updatePerQueryStatsMetrics()
 
 	// Obtain stream field names for the given query
 	startTime := time.Now()
-	names, err := vlstorage.GetStreamFieldNames(qctx)
+	names, err := vlstorage.GetStreamFieldNames(qctx, filter)
 	if err != nil {
-		httpserver.Errorf(w, r, "cannot obtain stream field names: %s", err)
+		httpserver.Errorf(w, r, "cannot obtain stream field names with filter %q: %s", filter, err)
 		return
 	}
 

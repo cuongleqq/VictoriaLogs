@@ -4,13 +4,13 @@ import (
 	"testing"
 )
 
-func TestStreamTagsUnmarshalString_Success(t *testing.T) {
+func TestStreamTagsUnmarshalStringInplace_Success(t *testing.T) {
 	f := func(s string) {
 		t.Helper()
 
 		var st StreamTags
-		if err := st.unmarshalString(s); err != nil {
-			t.Fatalf("unexpected error in unmarshalString(%s): %s", s, err)
+		if err := st.unmarshalStringInplace(s); err != nil {
+			t.Fatalf("unexpected error in unmarshalStringInplace(%s): %s", s, err)
 		}
 		result := st.String()
 		if result != s {
@@ -23,13 +23,13 @@ func TestStreamTagsUnmarshalString_Success(t *testing.T) {
 	f(`{a="b",c="d"}`)
 }
 
-func TestStreamTagsUnmarshalString_Failure(t *testing.T) {
+func TestStreamTagsUnmarshalStringInplace_Failure(t *testing.T) {
 	f := func(s string) {
 		t.Helper()
 
 		var st StreamTags
-		if err := st.unmarshalString(s); err == nil {
-			t.Fatalf("expecting non-nil error in unmarshalString(%s)", s)
+		if err := st.unmarshalStringInplace(s); err == nil {
+			t.Fatalf("expecting non-nil error in unmarshalStringInplace(%s)", s)
 		}
 	}
 

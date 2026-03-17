@@ -583,7 +583,9 @@ func toValuesWithHits(m map[string]*uint64) []ValueWithHits {
 }
 
 // GetStreamFieldNames returns stream field names for the given qctx.
-func (s *Storage) GetStreamFieldNames(qctx *QueryContext) ([]ValueWithHits, error) {
+//
+// If the filter is non-empty, then only the field names containing the filter substring are returned.
+func (s *Storage) GetStreamFieldNames(qctx *QueryContext, filter string) ([]ValueWithHits, error) {
 	streams, err := s.GetStreams(qctx, math.MaxUint64)
 	if err != nil {
 		return nil, err
@@ -591,6 +593,10 @@ func (s *Storage) GetStreamFieldNames(qctx *QueryContext) ([]ValueWithHits, erro
 
 	m := make(map[string]*uint64)
 	forEachStreamField(streams, func(f Field, hits uint64) {
+		if filter != "" && !strings.Contains(f.Name, filter) {
+			return
+		}
+
 		pHits := m[f.Name]
 		if pHits == nil {
 			nameCopy := strings.Clone(f.Name)

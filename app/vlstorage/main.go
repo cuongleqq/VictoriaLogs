@@ -587,11 +587,13 @@ func GetFieldValues(qctx *logstorage.QueryContext, fieldName, filter string, lim
 }
 
 // GetStreamFieldNames executes the given qctx and returns stream field names seen in results.
-func GetStreamFieldNames(qctx *logstorage.QueryContext) ([]logstorage.ValueWithHits, error) {
+//
+// If the filter is non-empty, then only the field names containing the filter substring are returned.
+func GetStreamFieldNames(qctx *logstorage.QueryContext, filter string) ([]logstorage.ValueWithHits, error) {
 	if localStorage != nil {
-		return localStorage.GetStreamFieldNames(qctx)
+		return localStorage.GetStreamFieldNames(qctx, filter)
 	}
-	return netstorageSelect.GetStreamFieldNames(qctx)
+	return netstorageSelect.GetStreamFieldNames(qctx, filter)
 }
 
 // GetStreamFieldValues executes the given qctx and returns stream field values for the given fieldName seen in results.

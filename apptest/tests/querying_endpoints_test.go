@@ -261,7 +261,7 @@ func TestVlsingleStreamFieldNamesResponse(t *testing.T) {
 	})
 	sut.ForceFlush(t)
 
-	f := func(query string, ignorePipes bool, responseExpected string) {
+	f := func(query, filter string, ignorePipes bool, responseExpected string) {
 		t.Helper()
 
 		ignorePipesStr := ""
@@ -270,6 +270,7 @@ func TestVlsingleStreamFieldNamesResponse(t *testing.T) {
 		}
 
 		response := sut.StreamFieldNames(t, query, apptest.StreamFieldNamesOpts{
+			Filter:      filter,
 			IgnorePipes: ignorePipesStr,
 		})
 		if response != responseExpected {
@@ -280,22 +281,87 @@ func TestVlsingleStreamFieldNamesResponse(t *testing.T) {
 	// 'select all' query
 	query := "*"
 	responseExpected := `{"values":[{"value":"foo","hits":2},{"value":"x","hits":2}]}`
-	f(query, false, responseExpected)
-	f(query, true, responseExpected)
+	f(query, "", false, responseExpected)
+	f(query, "", true, responseExpected)
+
+	// non-empty filter
+	query = "*"
+	responseExpected = `{"values":[{"value":"x","hits":2}]}`
+	f(query, "x", false, responseExpected)
+	f(query, "x", true, responseExpected)
 
 	// select logs matching x:=y
 	query = "x:=y"
 	responseExpected = `{"values":[{"value":"foo","hits":1},{"value":"x","hits":1}]}`
-	f(query, false, responseExpected)
-	f(query, true, responseExpected)
+	f(query, "", false, responseExpected)
+	f(query, "", true, responseExpected)
 
 	// select logs with additional pipe
 	query = "* | format 'abc' as new_field | set_stream_fields new_field, x"
 	responseExpected = `{"values":[{"value":"new_field","hits":2},{"value":"x","hits":2}]}`
-	f(query, false, responseExpected)
+	f(query, "", false, responseExpected)
 
 	responseExpected = `{"values":[{"value":"foo","hits":2},{"value":"x","hits":2}]}`
-	f(query, true, responseExpected)
+	f(query, "", true, responseExpected)
+}
+
+func TestVlclusterStreamFieldNamesResponse(t *testing.T) {
+	fs.MustRemoveDir(t.Name())
+	tc := apptest.NewTestCase(t)
+	defer tc.Stop()
+	sut := tc.MustStartDefaultVlcluster()
+
+	ingestRecords := []string{
+		`{"_time":"2025-06-05T14:30:19.088007Z","foo":"bar","x":"y"}`,
+		`{"_time":"2025-06-06T14:30:19.088007Z","foo":"bar","x":"z"}`,
+	}
+	sut.JSONLineWrite(t, ingestRecords, apptest.IngestOpts{
+		StreamFields: "foo,x",
+	})
+	sut.ForceFlush(t)
+
+	f := func(query, filter string, ignorePipes bool, responseExpected string) {
+		t.Helper()
+
+		ignorePipesStr := ""
+		if ignorePipes {
+			ignorePipesStr = "1"
+		}
+
+		response := sut.StreamFieldNames(t, query, apptest.StreamFieldNamesOpts{
+			Filter:      filter,
+			IgnorePipes: ignorePipesStr,
+		})
+		if response != responseExpected {
+			t.Fatalf("unexpected response\ngot\n%s\nwant\n%s", response, responseExpected)
+		}
+	}
+
+	// 'select all' query
+	query := "*"
+	responseExpected := `{"values":[{"value":"foo","hits":2},{"value":"x","hits":2}]}`
+	f(query, "", false, responseExpected)
+	f(query, "", true, responseExpected)
+
+	// non-empty filter
+	query = "*"
+	responseExpected = `{"values":[{"value":"x","hits":2}]}`
+	f(query, "x", false, responseExpected)
+	f(query, "x", true, responseExpected)
+
+	// select logs matching x:=y
+	query = "x:=y"
+	responseExpected = `{"values":[{"value":"foo","hits":1},{"value":"x","hits":1}]}`
+	f(query, "", false, responseExpected)
+	f(query, "", true, responseExpected)
+
+	// select logs with additional pipe
+	query = "* | format 'abc' as new_field | set_stream_fields new_field, x"
+	responseExpected = `{"values":[{"value":"new_field","hits":2},{"value":"x","hits":2}]}`
+	f(query, "", false, responseExpected)
+
+	responseExpected = `{"values":[{"value":"foo","hits":2},{"value":"x","hits":2}]}`
+	f(query, "", true, responseExpected)
 }
 
 func TestVlsingleStreamFieldValuesResponse(t *testing.T) {

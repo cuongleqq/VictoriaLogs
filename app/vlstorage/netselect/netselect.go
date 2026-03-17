@@ -219,8 +219,9 @@ func (sn *storageNode) getFieldValues(qctx *logstorage.QueryContext, fieldName, 
 	return sn.getValuesWithHits(qctx, "/internal/select/field_values", args)
 }
 
-func (sn *storageNode) getStreamFieldNames(qctx *logstorage.QueryContext) ([]logstorage.ValueWithHits, error) {
+func (sn *storageNode) getStreamFieldNames(qctx *logstorage.QueryContext, filter string) ([]logstorage.ValueWithHits, error) {
 	args := sn.getCommonArgs(StreamFieldNamesProtocolVersion, qctx)
+	args.Set("filter", filter)
 
 	return sn.getValuesWithHits(qctx, "/internal/select/stream_field_names", args)
 }
@@ -441,10 +442,10 @@ func (s *Storage) GetFieldValues(qctx *logstorage.QueryContext, fieldName, filte
 }
 
 // GetStreamFieldNames executes qctx and returns stream field names seen in results.
-func (s *Storage) GetStreamFieldNames(qctx *logstorage.QueryContext) ([]logstorage.ValueWithHits, error) {
+func (s *Storage) GetStreamFieldNames(qctx *logstorage.QueryContext, filter string) ([]logstorage.ValueWithHits, error) {
 	return s.getValuesWithHits(qctx, 0, false, func(ctx context.Context, sn *storageNode) ([]logstorage.ValueWithHits, error) {
 		qctxLocal := qctx.WithContext(ctx)
-		return sn.getStreamFieldNames(qctxLocal)
+		return sn.getStreamFieldNames(qctxLocal, filter)
 	})
 }
 

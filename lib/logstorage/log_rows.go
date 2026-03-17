@@ -382,7 +382,7 @@ func (lr *LogRows) MustAdd(tenantID TenantID, timestamp int64, fields []Field, s
 			f := &fields[i]
 			switch f.Name {
 			case "_stream":
-				if err := st.unmarshalString(f.Value); err != nil {
+				if err := st.unmarshalStringInplace(f.Value); err != nil {
 					line := MarshalFieldsToJSON(nil, fields)
 					invalidStreamTagsLogger.Warnf("cannot parse _stream=%s: %s; skipping the log entry; log entry: %s", f.Value, err, line)
 					return

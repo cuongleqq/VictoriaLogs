@@ -80,6 +80,7 @@ func (fos *FieldValuesOpts) asURLValues() url.Values {
 type StreamFieldNamesOpts struct {
 	Start       string
 	End         string
+	Filter      string
 	IgnorePipes string
 }
 
@@ -87,6 +88,7 @@ func (fos *StreamFieldNamesOpts) asURLValues() url.Values {
 	uv := make(url.Values)
 	addNonEmpty(uv, "start", fos.Start)
 	addNonEmpty(uv, "end", fos.End)
+	addNonEmpty(uv, "filter", fos.Filter)
 	addNonEmpty(uv, "ignore_pipes", fos.IgnorePipes)
 	return uv
 }

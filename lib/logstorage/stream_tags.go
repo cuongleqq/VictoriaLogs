@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -33,7 +32,7 @@ var streamTagsPool sync.Pool
 // StreamTags contains stream tags.
 type StreamTags struct {
 	// tags contains added tags.
-	tags []streamTag
+	tags []Field
 }
 
 // Reset resets st for reuse
@@ -68,11 +67,11 @@ func (st *StreamTags) marshalString(dst []byte) []byte {
 
 	tags := st.tags
 	if len(tags) > 0 {
-		dst = tags[0].marshalString(dst)
+		dst = tags[0].marshalToStreamTag(dst)
 		tags = tags[1:]
 		for i := range tags {
 			dst = append(dst, ',')
-			dst = tags[i].marshalString(dst)
+			dst = tags[i].marshalToStreamTag(dst)
 		}
 	}
 
@@ -81,46 +80,15 @@ func (st *StreamTags) marshalString(dst []byte) []byte {
 	return dst
 }
 
-func (st *StreamTags) unmarshalString(s string) error {
+// unmarshalStringInplace unmarshals st from string representation stored at s received via marshalString().
+//
+// st points to s, so s mustn't be changed while st is in use.
+func (st *StreamTags) unmarshalStringInplace(s string) error {
 	st.Reset()
 
-	if !strings.HasPrefix(s, "{") {
-		return fmt.Errorf("missing '{' in front of %q", s)
-	}
-	if !strings.HasSuffix(s, "}") {
-		return fmt.Errorf("missing '}' in the end of %q", s)
-	}
-	s = s[1 : len(s)-1]
-	for len(s) > 0 {
-		n := strings.IndexByte(s, '=')
-		if n < 0 {
-			return fmt.Errorf("missing '=' after %q", s)
-		}
-		name := s[:n]
-		s = s[n+1:]
-		prefix, err := strconv.QuotedPrefix(s)
-		if err != nil {
-			return fmt.Errorf("cannot parse value for the tag %q from %q: %w", name, s, err)
-		}
-		value, err := strconv.Unquote(prefix)
-		if err != nil {
-			return fmt.Errorf("cannot parse value for the tag %q from %q: %w", name, prefix, err)
-		}
-		st.tags = append(st.tags, streamTag{
-			Name:  name,
-			Value: value,
-		})
-		s = s[len(prefix):]
-
-		if len(s) == 0 {
-			return nil
-		}
-		if !strings.HasPrefix(s, ",") {
-			return fmt.Errorf("missing comma after %s=%s; unparsed tail: %s", name, prefix, s)
-		}
-		s = s[1:]
-	}
-	return nil
+	var err error
+	st.tags, err = parseStreamFields(st.tags[:0], s)
+	return err
 }
 
 // Add adds (name:value) tag to st.
@@ -135,7 +103,7 @@ func (st *StreamTags) Add(name, value string) {
 		name = "_msg"
 	}
 
-	st.tags = append(st.tags, streamTag{
+	st.tags = append(st.tags, Field{
 		Name:  name,
 		Value: value,
 	})
@@ -157,7 +125,7 @@ func (st *StreamTags) MarshalCanonical(dst []byte) []byte {
 
 // UnmarshalCanonicalInplace unmarshals st from src marshaled with MarshalCanonical.
 //
-// st points to to src, so src mustn't be changed while st is in use.
+// st points to src, so src mustn't be changed while st is in use.
 func (st *StreamTags) UnmarshalCanonicalInplace(src []byte) ([]byte, error) {
 	st.Reset()
 
@@ -228,62 +196,6 @@ func (st *StreamTags) Less(i, j int) bool {
 func (st *StreamTags) Swap(i, j int) {
 	tags := st.tags
 	tags[i], tags[j] = tags[j], tags[i]
-}
-
-// streamTag represents a (name:value) tag for stream.
-type streamTag struct {
-	Name  string
-	Value string
-}
-
-func (tag *streamTag) marshalString(dst []byte) []byte {
-	dst = append(dst, tag.Name...)
-	dst = append(dst, '=')
-	dst = strconv.AppendQuote(dst, tag.Value)
-	return dst
-}
-
-// reset resets the tag.
-func (tag *streamTag) reset() {
-	tag.Name = tag.Name[:0]
-	tag.Value = tag.Value[:0]
-}
-
-func (tag *streamTag) equal(t *streamTag) bool {
-	return string(tag.Name) == string(t.Name) && string(tag.Value) == string(t.Value)
-}
-
-func (tag *streamTag) less(t *streamTag) bool {
-	if string(tag.Name) != string(t.Name) {
-		return string(tag.Name) < string(t.Name)
-	}
-	return string(tag.Value) < string(t.Value)
-}
-
-func (tag *streamTag) indexdbMarshal(dst []byte) []byte {
-	dst = marshalTagValue(dst, tag.Name)
-	dst = marshalTagValue(dst, tag.Value)
-	return dst
-}
-
-func (tag *streamTag) indexdbUnmarshal(src, buf []byte) ([]byte, []byte, error) {
-	var err error
-
-	bufLen := len(buf)
-	src, buf, err = unmarshalTagValue(buf, src)
-	if err != nil {
-		return src, buf, fmt.Errorf("cannot unmarshal key: %w", err)
-	}
-	tag.Name = bytesutil.ToUnsafeString(buf[bufLen:])
-
-	bufLen = len(buf)
-	src, buf, err = unmarshalTagValue(buf, src)
-	if err != nil {
-		return src, buf, fmt.Errorf("cannot unmarshal value: %w", err)
-	}
-	tag.Value = bytesutil.ToUnsafeString(buf[bufLen:])
-
-	return src, buf, nil
 }
 
 const (

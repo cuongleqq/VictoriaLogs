@@ -232,10 +232,12 @@ func processStreamFieldNamesRequest(ctx context.Context, w http.ResponseWriter, 
 		return err
 	}
 
+	filter := r.FormValue("filter")
+
 	qctx := cp.NewQueryContext(ctx)
 	defer cp.UpdatePerQueryStatsMetrics()
 
-	fieldNames, err := vlstorage.GetStreamFieldNames(qctx)
+	fieldNames, err := vlstorage.GetStreamFieldNames(qctx, filter)
 	if err != nil {
 		return fmt.Errorf("cannot obtain stream field names: %w", err)
 	}

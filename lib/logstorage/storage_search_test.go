@@ -550,13 +550,28 @@ func TestStorageRunQuery(t *testing.T) {
 	t.Run("stream_field_names", func(t *testing.T) {
 		q := mustParseQuery("*")
 		qctx := newTestQueryContext(allTenantIDs, q)
-		results, err := s.GetStreamFieldNames(qctx)
+		results, err := s.GetStreamFieldNames(qctx, "")
 		if err != nil {
 			t.Fatalf("unexpected error: %s", err)
 		}
 
 		resultsExpected := []ValueWithHits{
 			{"instance", 1155},
+			{"job", 1155},
+		}
+		if !reflect.DeepEqual(results, resultsExpected) {
+			t.Fatalf("unexpected result; got\n%v\nwant\n%v", results, resultsExpected)
+		}
+	})
+	t.Run("stream_field_names-with-filter", func(t *testing.T) {
+		q := mustParseQuery("*")
+		qctx := newTestQueryContext(allTenantIDs, q)
+		results, err := s.GetStreamFieldNames(qctx, "ob")
+		if err != nil {
+			t.Fatalf("unexpected error: %s", err)
+		}
+
+		resultsExpected := []ValueWithHits{
 			{"job", 1155},
 		}
 		if !reflect.DeepEqual(results, resultsExpected) {
