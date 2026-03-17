@@ -40,9 +40,13 @@ const useDownloadLogs = () => {
       };
 
       const res = await fetchLogs({ query, period, isDownload: true, extraParams });
-
-      if (!res || Array.isArray(res) || !res.body) {
-        setSaveFileError("Download failed: missing response body.");
+      if (!res || Array.isArray(res) || !res.body || !res.ok) {
+        if (res instanceof Response) {
+          const errorText = await res.text();
+          setSaveFileError(errorText.trim() || `Download failed: ${res.status} ${res.statusText}`);
+        } else {
+          setSaveFileError("unable to fetch logs");
+        }
         return false;
       }
 
