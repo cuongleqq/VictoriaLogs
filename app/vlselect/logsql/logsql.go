@@ -1208,6 +1208,27 @@ func ProcessQueryRequest(ctx context.Context, w http.ResponseWriter, r *http.Req
 		ca.q.AddPipeOffsetLimit(uint64(offset), uint64(limit))
 	}
 
+	var csvHeader []byte
+	if format == "csv" {
+		fields, ok := ca.q.GetFixedFields()
+		if !ok {
+			// Slow path - detect the fields by scanning the logs for the given query.
+			qctx := ca.newQueryContext(ctx)
+			fieldNames, err := vlstorage.GetFieldNames(qctx, "")
+			if err != nil {
+				httpserver.Errorf(w, r, "cannot obtain field names for returning query results in csv format: %s", err)
+				return
+			}
+			fields = make([]string, len(fieldNames))
+			for i, fieldName := range fieldNames {
+				fields[i] = fieldName.Value
+			}
+			sort.Strings(fields)
+			ca.q.AddPipeFields(fields)
+		}
+		csvHeader = appendCSVLine(nil, fields)
+	}
+
 	sw := &syncWriter{
 		w: w,
 	}
@@ -1221,16 +1242,6 @@ func ProcessQueryRequest(ctx context.Context, w http.ResponseWriter, r *http.Req
 			}
 		}
 	}()
-
-	var csvHeader []byte
-	if format == "csv" {
-		fields, err := ca.q.GetFixedFields()
-		if err != nil {
-			httpserver.Errorf(w, r, "%s", err)
-			return
-		}
-		csvHeader = appendCSVLine(nil, fields)
-	}
 
 	startTime := time.Now()
 	writeResponseHeadersOnce := sync.OnceFunc(func() {

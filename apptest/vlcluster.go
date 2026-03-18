@@ -199,6 +199,19 @@ func (app *Vlcluster) Streams(t *testing.T, query string, opts StreamsOpts) stri
 	return app.selectNode.cli.PostFormSuccess(t, url, values)
 }
 
+// LogsQLQueryRaw sends HTTP POST request to /select/logsql/query endpoint and returns the plain response with status code.
+//
+// See https://docs.victoriametrics.com/victorialogs/querying/#querying-logs
+func (app *Vlcluster) LogsQLQueryRaw(t *testing.T, query string, opts QueryOpts) (string, int) {
+	t.Helper()
+
+	values := opts.asURLValues()
+	values.Add("query", query)
+
+	url := fmt.Sprintf("http://%s/select/logsql/query", app.selectNode.httpListenAddr)
+	return app.selectNode.cli.PostForm(t, url, values)
+}
+
 // String returns the string representation of the app state.
 func (app *Vlcluster) String() string {
 	return "Vlcluster"

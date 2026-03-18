@@ -775,10 +775,12 @@ func (q *Query) IsFixedOutputFieldsOrder() bool {
 }
 
 // GetFixedFields returns a set of fixed fields returned by the given query q.
-func (q *Query) GetFixedFields() ([]string, error) {
-	fields, pipeIdx, err := getFixedFields(q.pipes)
-	if err != nil {
-		return nil, err
+//
+// False is returned if it is impossible to detect the set of fields to return for the given q.
+func (q *Query) GetFixedFields() ([]string, bool) {
+	fields, pipeIdx := getFixedFields(q.pipes)
+	if pipeIdx < 0 {
+		return nil, false
 	}
 
 	// fix the order of fields if sort pipe is present
@@ -789,10 +791,10 @@ func (q *Query) GetFixedFields() ([]string, error) {
 		}
 	}
 
-	return fields, nil
+	return fields, true
 }
 
-func getFixedFields(pipes []pipe) ([]string, int, error) {
+func getFixedFields(pipes []pipe) ([]string, int) {
 	for i := len(pipes) - 1; i >= 0; i-- {
 		p := pipes[i]
 		switch t := p.(type) {
@@ -801,17 +803,17 @@ func getFixedFields(pipes []pipe) ([]string, int, error) {
 		case *pipeFields:
 			fields, ok := t.resultFields()
 			if !ok {
-				return nil, -1, fmt.Errorf("the `fields` pipe cannot contain wildcards; pipe: %q", p)
+				return nil, -1
 			}
-			return fields, i, nil
+			return fields, i
 		case *pipeStats:
 			fields := t.resultFields()
-			return fields, i, nil
+			return fields, i
 		default:
-			return nil, -1, fmt.Errorf("missing `fields` or `stats` pipe after %q", p)
+			return nil, -1
 		}
 	}
-	return nil, -1, fmt.Errorf("missing `fields` or `stats` pipes in the query")
+	return nil, -1
 }
 
 func getFilterTimeRange(f filter) (int64, int64) {
@@ -924,6 +926,18 @@ func (q *Query) addExtraFiltersNoSubqueries(filters []filter) {
 // AddPipeSortByTimeDesc adds `| sort (_time) desc` pipe to q.
 func (q *Query) AddPipeSortByTimeDesc() {
 	s := "sort by (_time) desc"
+	q.mustAppendPipe(s)
+}
+
+// AddPipeFields adds `| fields ...` pipe for the given fields to q.
+//
+// See https://docs.victoriametrics.com/victorialogs/logsql/#fields-pipe
+func (q *Query) AddPipeFields(fields []string) {
+	a := make([]string, len(fields))
+	for i, field := range fields {
+		a[i] = quoteTokenIfNeeded(field)
+	}
+	s := "fields " + strings.Join(a, ", ")
 	q.mustAppendPipe(s)
 }
 

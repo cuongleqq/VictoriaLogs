@@ -165,11 +165,10 @@ See also:
 The [`/select/logsql/query`](https://docs.victoriametrics.com/victorialogs/querying/#querying-logs) endpoint returns query results in CSV format
 if `format=csv` query arg is passed to this endpoint.
 
-The query must end with [`fields` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#fields-pipe) or [`stats` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe)
-in order to return results in CSV format. These pipes define the order of the returned fields, so CSV header can be reliably generated for these fields.
-If the query doesn't end with these pipes, then the returned logs may contain arbitrary sets of fields, so it is impossible to generate CSV header.
-The [`sort`](https://docs.victoriametrics.com/victorialogs/logsql/#sort-pipe) and [`limit`](https://docs.victoriametrics.com/victorialogs/logsql/#limit-pipe) pipes
-can be put after the `fields` and `stats` pipes when returning results in CSV format because these pipes do not change the set of the returned log fields.
+Performance tip: it is recommended specifying the list of log fields to return via [`fields` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#fields-pipe)
+or via [`stats` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe). If the query doesn't end with these pipes, then VictoriaLogs
+automatically detects the list of fields to return in CSV format across all the selected logs. This may take additional time, since it requires additional scanning
+for the selected logs.
 
 ### Live tailing
 

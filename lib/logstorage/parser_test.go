@@ -4465,9 +4465,9 @@ func TestQueryGetFixedFields_Success(t *testing.T) {
 			t.Fatalf("unexpected error: %s", err)
 		}
 
-		result, err := q.GetFixedFields()
-		if err != nil {
-			t.Fatalf("unexpected error in GetFixedFields(): %s", err)
+		result, ok := q.GetFixedFields()
+		if !ok {
+			t.Fatalf("unexpected error in GetFixedFields()")
 		}
 		if !reflect.DeepEqual(result, resultExpected) {
 			t.Fatalf("unexpected result\ngot\n%q\nwant\n%q", result, resultExpected)
@@ -4498,8 +4498,8 @@ func TestQueryGetFixedFields_Failure(t *testing.T) {
 			t.Fatalf("unexpected error: %s", err)
 		}
 
-		if _, err := q.GetFixedFields(); err == nil {
-			t.Fatalf("expecting non-nil error for the query [%s]", qStr)
+		if _, ok := q.GetFixedFields(); ok {
+			t.Fatalf("expecting error for the query [%s]", qStr)
 		}
 	}
 
