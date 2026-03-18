@@ -1999,6 +1999,9 @@ func TestParseQuery_Success(t *testing.T) {
 	f(`* | stats by (x, y) count_empty(a,b,c) z`, `* | stats by (x, y) count_empty(a, b, c) as z`)
 	f(`* | count_empty()`, `* | stats count_empty(*) as "count_empty(*)"`)
 
+	// stats pipe stddev
+	f(`* | stats StddeV(foo) bar`, `* | stats stddev(foo) as bar`)
+
 	// stats pipe sum
 	f(`* | stats Sum(foo) bar`, `* | stats sum(foo) as bar`)
 	f(`* | stats BY(x, y, ) SUM(foo,bar,) bar`, `* | stats by (x, y) sum(foo, bar) as bar`)
@@ -3244,6 +3247,9 @@ func TestQueryGetNeededColumns(t *testing.T) {
 	f(`* | stats quantile(0.5) q`, `*`, ``)
 	f(`* | stats quantile(0.5, *) q`, `*`, ``)
 	f(`* | stats quantile(0.5, x) q`, `x`, ``)
+	f(`* | stats stddev() q`, `*`, ``)
+	f(`* | stats stddev(*) q`, `*`, ``)
+	f(`* | stats stddev(x) q`, `x`, ``)
 	f(`* | stats sum() q`, `*`, ``)
 	f(`* | stats sum(*) q`, `*`, ``)
 	f(`* | stats sum(x) q`, `x`, ``)

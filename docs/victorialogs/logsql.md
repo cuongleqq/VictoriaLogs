@@ -4467,6 +4467,7 @@ LogsQL supports the following functions for [`stats` pipe](https://docs.victoria
 - [`row_any`](https://docs.victoriametrics.com/victorialogs/logsql/#row_any-stats) returns a sample [log entry](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model) for each selected [stats group](https://docs.victoriametrics.com/victorialogs/logsql/#stats-by-fields).
 - [`row_max`](https://docs.victoriametrics.com/victorialogs/logsql/#row_max-stats) returns the [log entry](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model) with the maximum value at the given field.
 - [`row_min`](https://docs.victoriametrics.com/victorialogs/logsql/#row_min-stats) returns the [log entry](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model) with the minimum value at the given field.
+- [`stddev`](https://docs.victoriametrics.com/victorialogs/logsql/#stddev-stats) returns the [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) for the given numeric [log fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model).
 - [`sum`](https://docs.victoriametrics.com/victorialogs/logsql/#sum-stats) returns the sum for the given numeric [log fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model).
 - [`sum_len`](https://docs.victoriametrics.com/victorialogs/logsql/#sum_len-stats) returns the sum of lengths for the given [log fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model).
 - [`uniq_values`](https://docs.victoriametrics.com/victorialogs/logsql/#uniq_values-stats) returns unique non-empty values for the given [log fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model).
@@ -4512,10 +4513,7 @@ See also:
 
 - [`median`](https://docs.victoriametrics.com/victorialogs/logsql/#median-stats)
 - [`quantile`](https://docs.victoriametrics.com/victorialogs/logsql/#quantile-stats)
-- [`min`](https://docs.victoriametrics.com/victorialogs/logsql/#min-stats)
-- [`max`](https://docs.victoriametrics.com/victorialogs/logsql/#max-stats)
-- [`sum`](https://docs.victoriametrics.com/victorialogs/logsql/#sum-stats)
-- [`count`](https://docs.victoriametrics.com/victorialogs/logsql/#count-stats)
+- [`stddev`](https://docs.victoriametrics.com/victorialogs/logsql/#stddev-stats)
 
 ### count stats
 
@@ -4821,6 +4819,7 @@ See also:
 
 - [`quantile`](https://docs.victoriametrics.com/victorialogs/logsql/#quantile-stats)
 - [`avg`](https://docs.victoriametrics.com/victorialogs/logsql/#avg-stats)
+- [`stddev`](https://docs.victoriametrics.com/victorialogs/logsql/#stddev-stats)
 
 ### min stats
 
@@ -5015,6 +5014,27 @@ See also:
 - [`row_max`](https://docs.victoriametrics.com/victorialogs/logsql/#row_max-stats)
 - [`row_any`](https://docs.victoriametrics.com/victorialogs/logsql/#row_any-stats)
 - [`json_values`](https://docs.victoriametrics.com/victorialogs/logsql/#json_values-stats)
+
+### stddev stats
+
+`stddev(field1, ..., fieldN)` [stats pipe function](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe-functions)
+calculates [standard deviation](https://en.wikipedia.org/wiki/Standard_deviation) over the numeric value across
+all the mentioned [log fields](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model).
+Non-numeric values are skipped. If all the values across `field1`, ..., `fieldN` are non-numeric, then `NaN` is returned.
+
+For example, the following query returns standard deviation for the `duration` [field](https://docs.victoriametrics.com/victorialogs/keyconcepts/#data-model)
+over logs for the last 5 minutes:
+
+```logsql
+_time:5m | stats stddev(duration) stddev_duration
+```
+
+It is possible to find the standard deviation for all the fieldw tih common prefix via `stddev(prefix*)` syntax.
+
+See also:
+
+- [`avg`](https://docs.victoriametrics.com/victorialogs/logsql/#avg-stats)
+- [`median`](https://docs.victoriametrics.com/victorialogs/logsql/#median-stats)
 
 ### sum stats
 

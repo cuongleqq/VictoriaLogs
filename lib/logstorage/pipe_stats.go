@@ -1401,6 +1401,7 @@ func initStatsFuncParsers() {
 		"row_any":         parseStatsRowAny,
 		"row_max":         parseStatsRowMax,
 		"row_min":         parseStatsRowMin,
+		"stddev":          parseStatsStddev,
 		"sum":             parseStatsSum,
 		"sum_len":         parseStatsSumLen,
 		"uniq_values":     parseStatsUniqValues,
