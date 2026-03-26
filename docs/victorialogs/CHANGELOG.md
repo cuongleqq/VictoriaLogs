@@ -22,6 +22,7 @@ according to the following docs:
 
 ## tip
 
+* BUGFIX: [/select/logsql/query](https://docs.victoriametrics.com/victorialogs/querying/#querying-logs): fix panic when exporting query results in CSV format if a field contains multiple quoted segments. See [#1220](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1220).
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): make legend click perform default action (hide/show series) and move additional actions to hover context menu.
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): improve alert component and simplify error messages for stats view. See [#1128](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1128).
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): use `extra_filters` instead of modifying query when adding legend filters. See [#411](https://github.com/VictoriaMetrics/VictoriaLogs/issues/411).
