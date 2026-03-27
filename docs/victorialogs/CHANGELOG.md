@@ -22,7 +22,6 @@ according to the following docs:
 
 ## tip
 
-* BUGFIX: [/select/logsql/query](https://docs.victoriametrics.com/victorialogs/querying/#querying-logs): fix panic when exporting query results in CSV format if a field contains multiple quoted segments. See [#1220](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1220).
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): make legend click perform default action (hide/show series) and move additional actions to hover context menu.
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): improve alert component and simplify error messages for stats view. See [#1128](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1128).
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): use `extra_filters` instead of modifying query when adding legend filters. See [#411](https://github.com/VictoriaMetrics/VictoriaLogs/issues/411).
@@ -38,6 +37,7 @@ according to the following docs:
 * FEATURE: [`/select/logsql/stream_field_names` HTTP endpoint](https://docs.victoriametrics.com/victorialogs/querying/#querying-stream-field-names): add support for an optional `filter=substring` query arg, which allows returning only the field names containing the given `substring`. See [#1186](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1186).
 * FEATURE: [`/select/logsql/stream_field_values` HTTP endpoint](https://docs.victoriametrics.com/victorialogs/querying/#querying-stream-field-values): add support for an optional `filter=substring` query arg, which allows returning only the field values containing the given `substring`. See [#1186](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1186).
 
+* BUGFIX: [/select/logsql/query](https://docs.victoriametrics.com/victorialogs/querying/#querying-logs): fix panic when exporting query results in CSV format if a field contains multiple quoted segments. See [#1220](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1220).
 * BUGFIX: [data ingestion](https://docs.victoriametrics.com/victorialogs/data-ingestion/): properly handle the case when the ingested logs contain `_time` field without the real timestamp, and this field is not mentioned in the `_time_field` query arg or in the `VL-Time-Field` request header according to [these docs](https://docs.victoriametrics.com/victorialogs/data-ingestion/#http-parameters). Previously this could lead to unexpected errors during querying such as `missing _time field in the query results`. See [#1168](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1168).
 * BUGFIX: [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/): properly apply [query options](https://docs.victoriametrics.com/victorialogs/logsql/#query-options) at `vlselect` in [cluster setup](https://docs.victoriametrics.com/victorialogs/cluster/). Previously the options were sent to `vlstorage`, but were ignored at `vlselect`. This could lead to incorrect query results.
 
