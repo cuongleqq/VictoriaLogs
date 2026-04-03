@@ -22,6 +22,10 @@ according to the following docs:
 
 ## tip
 
+## [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0)
+
+Released at 2026-04-03
+
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): make legend click perform default action (hide/show series) and move additional actions to hover context menu.
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): improve alert component and simplify error messages for stats view. See [#1128](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1128).
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): use `extra_filters` instead of modifying query when adding legend filters. See [#411](https://github.com/VictoriaMetrics/VictoriaLogs/issues/411).
