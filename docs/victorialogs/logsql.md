@@ -3531,20 +3531,51 @@ _time:5m | stats by (ip:/24) count() requests_per_subnet
 
 #### Stats with additional filters
 
-Sometimes it is needed to calculate [stats](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe) on different subsets of matching logs. This can be done by inserting an `if (<any_filters>)` condition
-between the [stats function](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe-functions) and `result_name`, where `any_filters` can contain arbitrary [filters](https://docs.victoriametrics.com/victorialogs/logsql/#filters).
+Sometimes it is needed to calculate [stats](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe) on different subsets of matching logs.
+This can be done by inserting an `if (<any_filters>)` condition between the [stats function](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe-functions) and `result_name`,
+where `any_filters` can contain arbitrary [filters](https://docs.victoriametrics.com/victorialogs/logsql/#filters).
 For example, the following query calculates individually the number of [log messages](https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field)
 with `GET`, `POST` and `PUT` [words](https://docs.victoriametrics.com/victorialogs/logsql/#word), additionally to the total number of logs over the last 5 minutes:
 
 ```logsql
 _time:5m | stats
-  count() if (GET) gets,
-  count() if (POST) posts,
-  count() if (PUT) puts,
-  count() total
+  count() if (GET) as gets,
+  count() if (POST) as posts,
+  count() if (PUT) as puts,
+  count() if (not(GET or POST or PUT)) as other,
+  count() as total
 ```
 
-If zero input rows match the given `if (...)` filter, then the corresponding stats function is calculated over an empty set of rows. The returned value depends on the function. For example, `count(*)` returns `0`, while `sum(...)` and `avg(...)` return `NaN`.
+The query above can be rewritten in more convenient way by using `switch(...)` syntax instead of `if(...)`:
+
+```logsql
+_time:5m | stats
+  count() switch(
+    case (GET) as gets,
+    case (POST) as posts,
+    case (PUT) as puts,
+    default as other
+  ),
+  count() as total
+```
+
+The `default` case matches logs which didn't go into the rest of the cases inside the given `switch`.
+
+The `if` word can be used instead of the `case` in the query above:
+
+```logsql
+_time:5m | stats
+  count() switch(
+    if (GET) as gets,
+    if (POST) as posts,
+    if (PUT) as puts,
+    default as other
+  ),
+  count() as total
+```
+
+If zero input rows match the given `if (...)` or `case (...)` filter, then the corresponding stats function is calculated over an empty set of rows.
+The returned value depends on the function. For example, `count(*)` returns `0`, while `sum(...)` and `avg(...)` return `NaN`.
 
 See also:
 

@@ -724,6 +724,16 @@ func TestStorageRunQuery(t *testing.T) {
 			},
 		})
 	})
+	t.Run("stats-switch", func(t *testing.T) {
+		f(t, `* | stats count() as rows, count() switch(default as other, case({instance="host-1:234"}) host1, if({instance="host-2:234"}) host2)`, [][]Field{
+			{
+				{"rows", "1155"},
+				{"other", "385"},
+				{"host1", "385"},
+				{"host2", "385"},
+			},
+		})
+	})
 	t.Run("query_stats-sum_len", func(t *testing.T) {
 		f(t, `* | sum_len(*) | query_stats | keep TimestampsRead, ValuesRead, RowsFound`, [][]Field{
 			{

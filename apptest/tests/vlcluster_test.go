@@ -47,6 +47,11 @@ func TestVlclusterIngestAndQuery(t *testing.T) {
 		`{"logs":"5"}`,
 	})
 
+	// Verify stats pipe with switch
+	f("* | stats count() total, count() switch(case (aa) x, case (gh) y, case (aaa) yy, default z), count() if (abc) q", []string{
+		`{"total":"5","x":"2","y":"1","yy":"0","z":"2","q":"1"}`,
+	})
+
 	// Verify in(items)
 	f("x:in(y,aaa) | count() as logs", []string{
 		`{"logs":"4"}`,
