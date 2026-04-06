@@ -23,6 +23,7 @@ according to the following docs:
 ## tip
 
 * BUGFIX: [/select/logsql/hits](https://docs.victoriametrics.com/victorialogs/querying/#querying-hits-stats): fix `invalid memory address or nil pointer dereference` panic when the `query` passed to `/select/logsql/hits` contains [`union rows(...)`](https://docs.victoriametrics.com/victorialogs/logsql/#adding-static-logs). The panic has been introduced in [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0).
+* BUGFIX: [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/): return a parse error for invalid weekday names in the [`week_range` filter](https://docs.victoriametrics.com/victorialogs/logsql/#week-range-filter). Previously they were silently treated as `Sunday`, which could lead to incorrect query results. See [#1269](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1269).
 
 ## [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0)
 
