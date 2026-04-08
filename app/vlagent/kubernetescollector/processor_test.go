@@ -1,6 +1,7 @@
 package kubernetescollector
 
 import (
+	"flag"
 	"fmt"
 	"strings"
 	"testing"
@@ -120,6 +121,39 @@ func TestProcessor(t *testing.T) {
 	}
 	expectedContents = []string{`{"_msg":"foo\tbar","_stream":"{}","_time":"2025-10-16T15:37:36.330062387Z"}`}
 	f(in, expectedContents)
+}
+
+func TestProcessorUsesDefaultMsgValueFlag(t *testing.T) {
+	flagValue := flag.Lookup("defaultMsgValue")
+	if flagValue == nil {
+		t.Fatal("missing defaultMsgValue flag")
+	}
+	originalValue := flagValue.Value.String()
+	if err := flagValue.Value.Set("-"); err != nil {
+		t.Fatalf("cannot set defaultMsgValue flag: %s", err)
+	}
+	t.Cleanup(func() {
+		if err := flagValue.Value.Set(originalValue); err != nil {
+			t.Fatalf("cannot restore defaultMsgValue flag: %s", err)
+		}
+	})
+
+	storage := newTestLogRowsStorage()
+	commonFields := getCommonFields(node{}, namespace{}, pod{}, containerStatus{})
+	proc := newLogFileProcessor(storage, commonFields)
+
+	proc.TryAddLine([]byte(`2025-10-16T15:37:36.330062387Z stderr F {"service":"demo","status":"ok"}`))
+
+	if len(storage.logRows) != 1 {
+		t.Fatalf("unexpected rows count; got %d; want %d", len(storage.logRows), 1)
+	}
+	logRow := storage.logRows[0]
+	if !strings.Contains(logRow, `"_msg":"-"`) {
+		t.Fatalf("expected overridden default message in row %q", logRow)
+	}
+	if strings.Contains(logRow, `missing _msg field`) {
+		t.Fatalf("unexpected built-in default message in row %q", logRow)
+	}
 }
 
 func TestParseKlog(t *testing.T) {
