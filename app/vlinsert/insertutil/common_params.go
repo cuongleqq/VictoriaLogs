@@ -1,7 +1,6 @@
 package insertutil
 
 import (
-	"flag"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -18,16 +17,6 @@ import (
 
 	"github.com/VictoriaMetrics/VictoriaLogs/lib/logstorage"
 )
-
-var (
-	defaultMsgValue = flag.String("defaultMsgValue", "missing _msg field; see https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field",
-		"Default value for _msg field if the ingested log entry doesn't contain it; see https://docs.victoriametrics.com/victorialogs/keyconcepts/#message-field")
-)
-
-// GetLogRows returns LogRows configured with the current insertutil defaults.
-func GetLogRows(streamFields, ignoreFields, decolorizeFields []string, extraFields []logstorage.Field) *logstorage.LogRows {
-	return logstorage.GetLogRows(streamFields, ignoreFields, decolorizeFields, extraFields, *defaultMsgValue)
-}
 
 // CommonParams contains common HTTP parameters used by log ingestion APIs.
 //
@@ -356,7 +345,7 @@ func (lmp *logMessageProcessor) MustClose() {
 //
 // MustClose() must be called on the returned LogMessageProcessor when it is no longer needed.
 func (cp *CommonParams) NewLogMessageProcessor(protocolName string, isStreamMode bool) LogMessageProcessor {
-	lr := GetLogRows(cp.StreamFields, cp.IgnoreFields, cp.DecolorizeFields, cp.ExtraFields)
+	lr := logstorage.GetLogRows(cp.StreamFields, cp.IgnoreFields, cp.DecolorizeFields, cp.ExtraFields, *DefaultMsgValue)
 
 	rowsIngestedTotal := metrics.GetOrCreateCounter(fmt.Sprintf("vl_rows_ingested_total{type=%q}", protocolName))
 	bytesIngestedTotal := metrics.GetOrCreateCounter(fmt.Sprintf("vl_bytes_ingested_total{type=%q}", protocolName))

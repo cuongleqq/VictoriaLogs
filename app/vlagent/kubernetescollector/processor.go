@@ -89,7 +89,7 @@ func newLogFileProcessor(storage insertutil.LogRowsStorage, commonFields []logst
 
 	sfs := getStreamFields()
 	efs := getExtraFields()
-	lr := insertutil.GetLogRows(sfs, *ignoreFields, *decolorizeFields, efs)
+	lr := logstorage.GetLogRows(sfs, *ignoreFields, *decolorizeFields, efs, *insertutil.DefaultMsgValue)
 
 	return &logFileProcessor{
 		storage:             storage,
