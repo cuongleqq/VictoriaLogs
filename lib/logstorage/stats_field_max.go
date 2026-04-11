@@ -60,7 +60,7 @@ func (smp *statsFieldMaxProcessor) updateStatsForAllRows(sf statsFunc, br *block
 		bb := bbPool.Get()
 		bb.B = marshalTimestampRFC3339NanoString(bb.B[:0], maxTimestamp)
 		v := bytesutil.ToUnsafeString(bb.B)
-		stateSizeIncrease += smp.updateState(sm, v, br, br.rowsLen-1)
+		stateSizeIncrease += smp.updateState(sm, v, br, 0)
 		bbPool.Put(bb)
 		return stateSizeIncrease
 	}
