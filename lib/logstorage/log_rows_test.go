@@ -407,3 +407,62 @@ func TestInsertRow_MarshalJSON(t *testing.T) {
 		},
 	}, `{"_time":"1970-01-01T00:00:00.123456789Z","x":"\"y\""}`)
 }
+
+func TestVerifyStreamTagsCanonical_Success(t *testing.T) {
+	f := func(streamTags, fieldsStr string) {
+		t.Helper()
+
+		st := GetStreamTags()
+		if err := st.unmarshalStringInplace(streamTags); err != nil {
+			t.Fatalf("cannot unmarshal stream tags: %s", err)
+		}
+		streamTagsCanonical := st.MarshalCanonical(nil)
+		PutStreamTags(st)
+
+		p := getLogfmtParser()
+		defer putLogfmtParser(p)
+		p.parse(fieldsStr)
+
+		if err := verifyStreamTagsCanonical(string(streamTagsCanonical), p.fields); err != nil {
+			t.Fatalf("cannot verify stream tags: %s", err)
+		}
+	}
+
+	f(`{}`, ``)
+	f(`{}`, `a=b c=d`)
+	f(`{a="b"}`, `a=b`)
+	f(`{a="b"}`, `x=y a=b q=w`)
+	f(`{a="b",c="d"}`, `c=d x=y a=b`)
+	f(`{a="b"}`, `a=b x=y a=b`)
+}
+
+func TestVerifyStreamTagsCanonical_Failure(t *testing.T) {
+	f := func(streamTags, fieldsStr string) {
+		t.Helper()
+
+		st := GetStreamTags()
+		if err := st.unmarshalStringInplace(streamTags); err != nil {
+			t.Fatalf("cannot unmarshal stream tags: %s", err)
+		}
+		streamTagsCanonical := st.MarshalCanonical(nil)
+		PutStreamTags(st)
+
+		p := getLogfmtParser()
+		defer putLogfmtParser(p)
+		p.parse(fieldsStr)
+
+		if err := verifyStreamTagsCanonical(string(streamTagsCanonical), p.fields); err == nil {
+			t.Fatalf("expecting non-nil error")
+		}
+	}
+
+	// missing value
+	f(`{a="b"}`, ``)
+	f(`{a="b"}`, `x=y`)
+
+	// value mismatch
+	f(`{a="b"}`, `a=c`)
+
+	// multiple fields with the same name
+	f(`{a="b"}`, `a=b x=y a=c`)
+}
