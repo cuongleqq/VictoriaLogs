@@ -1518,6 +1518,9 @@ func parseStatsSwitch(lex *lexer, sf statsFunc) (*pipeStatsSwitch, error) {
 			lex.nextToken()
 		}
 	}
+	if len(cases) == 0 {
+		return nil, fmt.Errorf("switch(...) must contain at least a single 'case' or 'default'")
+	}
 	lex.nextToken()
 
 	return &pipeStatsSwitch{
