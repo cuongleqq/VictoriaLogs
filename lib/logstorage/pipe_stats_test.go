@@ -62,6 +62,10 @@ func TestParsePipeStatsFailure(t *testing.T) {
 	f(`stats count() switch()`)
 	f(`stats by (x) count() switch()`)
 	f(`stats count(), avg() switch()`)
+
+	// multiple defaults
+	f(`stats count() switch(default a, default b)`)
+	f(`stats count() as total, avg() switch(case (x) avg_x, default avg_other, default avg_fallback)`)
 }
 
 func TestPipeStats(t *testing.T) {
