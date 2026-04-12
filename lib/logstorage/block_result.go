@@ -507,6 +507,8 @@ func (br *blockResult) getMinTimestamp(minTimestamp int64) int64 {
 	if br.bs != nil {
 		th := &br.bs.bsw.bh.timestampsHeader
 		if br.isFull() {
+			// Fast path - all the rows in the br are present, so return the minTimestamp
+			// from blockHeader without the need to read the actual timestamps.
 			return min(minTimestamp, th.minTimestamp)
 		}
 		if minTimestamp <= th.minTimestamp {
@@ -514,8 +516,18 @@ func (br *blockResult) getMinTimestamp(minTimestamp int64) int64 {
 		}
 	}
 
-	// Slow path - need to scan timestamps
 	timestamps := br.getTimestamps()
+	c := br.getColumnByName("_time")
+	if c.isTime {
+		// Slower path - some of the rows in the br are filtered out,
+		// so try obtaining the _time column and return the first timestamp from there.
+		if len(timestamps) > 0 {
+			return min(minTimestamp, timestamps[0])
+		}
+		return minTimestamp
+	}
+
+	// Slow path - need to scan timestamps, since they may be not sorted.
 	for _, timestamp := range timestamps {
 		if timestamp < minTimestamp {
 			minTimestamp = timestamp
@@ -528,6 +540,8 @@ func (br *blockResult) getMaxTimestamp(maxTimestamp int64) int64 {
 	if br.bs != nil {
 		th := &br.bs.bsw.bh.timestampsHeader
 		if br.isFull() {
+			// Fast path - all the rows in the br are present, so return the maxTimestamp
+			// from blockHeader without the need to read the actual timestamps.
 			return max(maxTimestamp, th.maxTimestamp)
 		}
 		if maxTimestamp >= th.maxTimestamp {
@@ -535,8 +549,18 @@ func (br *blockResult) getMaxTimestamp(maxTimestamp int64) int64 {
 		}
 	}
 
-	// Slow path - need to scan timestamps
 	timestamps := br.getTimestamps()
+	c := br.getColumnByName("_time")
+	if c.isTime {
+		// Slower path - some of the rows in the br are filtered out,
+		// so try obtaining the _time column and return the last timestamp from there.
+		if len(timestamps) > 0 {
+			return max(maxTimestamp, timestamps[len(timestamps)-1])
+		}
+		return maxTimestamp
+	}
+
+	// Slow path - need to scan timestamps, since they may be not sorted.
 	for i := len(timestamps) - 1; i >= 0; i-- {
 		if timestamps[i] > maxTimestamp {
 			maxTimestamp = timestamps[i]
