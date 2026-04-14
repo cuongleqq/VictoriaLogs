@@ -37,6 +37,7 @@ according to the following docs:
 * BUGFIX: [/select/logsql/hits](https://docs.victoriametrics.com/victorialogs/querying/#querying-hits-stats): fix `invalid memory address or nil pointer dereference` panic when the `query` passed to `/select/logsql/hits` contains [`union rows(...)`](https://docs.victoriametrics.com/victorialogs/logsql/#adding-static-logs). The panic has been introduced in [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0).
 * BUGFIX: [/select/logsql/hits](https://docs.victoriametrics.com/victorialogs/querying/#querying-hits-stats): fix panic when the internal `stats` pipe generated for this endpoint uses `hits` both as a grouping field and as the result name. See [#1278](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1278).
 * BUGFIX: [OpenTelemetry data ingestion](https://docs.victoriametrics.com/victorialogs/data-ingestion/opentelemetry/): replace custom `severity` field with `severity_number` and `severity_text` to be compatible with other solutions. See [#1246](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1246).
+* BUGFIX: [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/): hide sensitive values passed via `-remoteWrite.headers` in `/metrics`, `/flags`, and startup logs. Previously these values could be exposed in plain text.
 
 ## [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0)
 
