@@ -51,7 +51,7 @@ var tenantID logstorage.TenantID
 func MustInit() {
 	t, err := logstorage.ParseTenantID(*journaldTenantID)
 	if err != nil {
-		logger.Panicf("cannot parse -journald.tenantID=%q for journald: %s", *journaldTenantID, err)
+		logger.Panicf("FATAL: cannot parse -journald.tenantID=%q for journald: %s", *journaldTenantID, err)
 	}
 	tenantID = t
 }
