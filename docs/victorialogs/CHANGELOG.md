@@ -43,6 +43,7 @@ according to the following docs:
 * BUGFIX: [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/): hide sensitive values passed via `-remoteWrite.headers` in `/metrics`, `/flags`, and startup logs. Previously these values could be exposed in plain text.
 * BUGFIX: [storage](https://docs.victoriametrics.com/victorialogs/keyconcepts/#partitions): fix `cannot read directory contents: open ... .DS_Store: not a directory` panic when restarting VictoriaLogs on MacOS. See [#996](https://github.com/VictoriaMetrics/VictoriaLogs/issues/996).
 * BUGFIX: [partitions lifecycle](https://docs.victoriametrics.com/victorialogs/#partitions-lifecycle): fix querying logs after detaching, removing and then re-creating the same per-day partition before VictoriaLogs restart. Previously newly ingested logs could be missing from normal queries and from `_stream:{...}` filters until restart. See [#657](https://github.com/VictoriaMetrics/VictoriaLogs/issues/657).
+* BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): fix incorrect border colors. The issue was introduced in [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0). See [#1271](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1271).
 
 ## [v1.49.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.49.0)
 
