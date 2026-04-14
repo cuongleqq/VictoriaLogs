@@ -22,6 +22,10 @@ according to the following docs:
 
 ## tip
 
+## [v1.50.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.50.0)
+
+Released at 2026-04-14
+
 * SECURITY: upgrade Go builder from Go1.26.1 to Go1.26.2. See [the list of issues addressed in Go1.26.2](https://github.com/golang/go/issues?q=milestone%3AGo1.26.2%20label%3ACherryPickApproved).
 
 * FEATURE: [data ingestion](https://docs.victoriametrics.com/victorialogs/data-ingestion/): add an ability to send logs via Splunk data ingestion protocol. See [these docs](https://docs.victoriametrics.com/victorialogs/data-ingestion/splunk/). See [#710](https://github.com/VictoriaMetrics/VictoriaLogs/pull/710).
