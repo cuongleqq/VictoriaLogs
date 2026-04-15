@@ -24,6 +24,9 @@ according to the following docs:
 
 * FEATURE: [querying API](https://docs.victoriametrics.com/victorialogs/querying/): allow using [`limit`](https://docs.victoriametrics.com/victorialogs/logsql/#limit-pipe) and [`offset`](https://docs.victoriametrics.com/victorialogs/logsql/#offset-pipe) pipes after the [`stats` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#stats-pipe) in queries to [`/select/logsql/stats_query`](https://docs.victoriametrics.com/victorialogs/querying/#querying-log-stats). This enables the usage for these pipes in [alerting and recording rules for VictoriaLogs](https://docs.victoriametrics.com/victorialogs/vmalert/). See [#1296](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1296).
 
+* BUGFIX: [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/): properly keep the top N logs for [`json_values` stats function](https://docs.victoriametrics.com/victorialogs/logsql/#json_values-stats) when using `sort by (...) limit N`. Previously, some logs that should have been included in the top N results could be incorrectly dropped from the result. See [#1311](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1311).
+
+
 ## [v1.50.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.50.0)
 
 Released at 2026-04-14
