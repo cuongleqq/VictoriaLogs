@@ -51,6 +51,11 @@ func TestVlsingleStatsQuery_Success(t *testing.T) {
 	f(`* | stats by (x) count() q, max(x) xmax | math q / xmax as y | sort by (y desc) | keep x, y`, `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"y","x":"1"},"value":[1735689900,"1"]},{"metric":{"__name__":"y","x":"5"},"value":[1735689900,"0.2"]}]}}`)
 	f(`* | stats by (x) count() q, max(x) xmax | math q / xmax as y | sort by (y desc) | keep y, x`, `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"y","x":"1"},"value":[1735689900,"1"]},{"metric":{"__name__":"y","x":"5"},"value":[1735689900,"0.2"]}]}}`)
 
+	// sort
+	f(`* | stats by (x) count() q | sort by (q desc) limit 1`, `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"q","x":"5"},"value":[1735689900,"1"]}]}}`)
+	f(`* | stats by (x) count() q | first 1 by (q desc)`, `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"q","x":"5"},"value":[1735689900,"1"]}]}}`)
+	f(`* | stats by (x) count() q | last 1 by (q)`, `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"q","x":"5"},"value":[1735689900,"1"]}]}}`)
+
 	// it is OK to drop _time when calculating instant stats
 	f(`* | fields x | stats count() q`, `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"q"},"value":[1735689900,"2"]}]}}`)
 	f(`* | delete _time | stats count() q `, `{"status":"success","data":{"resultType":"vector","result":[{"metric":{"__name__":"q"},"value":[1735689900,"2"]}]}}`)
