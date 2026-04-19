@@ -27,6 +27,7 @@ according to the following docs:
 
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): sanitize markdown URLs in logs rendered with `markdown parsing` enabled, allowing only `http`, `https`, `mailto`, and `tel` schemes for active links and images. See [#1313](https://github.com/VictoriaMetrics/VictoriaLogs/pull/1313).
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): improve context view highlight visibility in dark theme. The selected log entry is now highlighted with a more visible blue tint instead of barely visible gray background. See [#1196](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1196).
+* BUGFIX: [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/): fix [`week_range[Sun,Sun]` filter](https://docs.victoriametrics.com/victorialogs/logsql/#week-range-filter) when it is used inside the [`filter` pipe](https://docs.victoriametrics.com/victorialogs/logsql/#filter-pipe). Previously, it could fail to match rows on Sunday. See [#1335](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1335).
 
 ## [v1.50.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.50.0)
 
