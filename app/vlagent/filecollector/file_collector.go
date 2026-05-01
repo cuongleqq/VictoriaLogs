@@ -117,10 +117,8 @@ func startRead(argIdx int, filePath string) {
 		return
 	}
 
-	if excludePattern := excludeGlob.GetOptionalArg(argIdx); excludePattern != "" {
-		if ok, _ := filepath.Match(excludePattern, filePath); ok {
-			return
-		}
+	if isExcluded(filePath) {
+		return
 	}
 
 	if filepath.Ext(filePath) == ".gz" {
@@ -173,4 +171,13 @@ func isGlob(pattern string) bool {
 		return strings.ContainsAny(pattern, "*?[")
 	}
 	return strings.ContainsAny(pattern, `*?[\`)
+}
+
+func isExcluded(filePath string) bool {
+	for _, pattern := range *excludeGlob {
+		if matched, _ := filepath.Match(pattern, filePath); matched {
+			return true
+		}
+	}
+	return false
 }
