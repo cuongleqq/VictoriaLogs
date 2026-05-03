@@ -2323,7 +2323,7 @@ func parseAnyCaseFilter(lex *lexer, fieldName string) (filter, error) {
 	})
 }
 
-func parseFuncArgMaybePrefix(lex *lexer, fieldName string, callback func(arg string, isPrefiFilter bool) (filter, error)) (filter, error) {
+func parseFuncArgMaybePrefix(lex *lexer, fieldName string, callback func(arg string, isPrefixFilter bool) (filter, error)) (filter, error) {
 	lexState := lex.backupState()
 
 	funcName := lex.token
