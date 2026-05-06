@@ -27,8 +27,11 @@ according to the following docs:
 * FEATURE: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): remove the `Date format` setting and always display timestamps with nanosecond precision. See [#1161](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1161).
 
 * BUGFIX: [LogsQL](https://docs.victoriametrics.com/victorialogs/logsql/): fix [`sort by (_time) limit N`](https://docs.victoriametrics.com/victorialogs/logsql/#sort-pipe) returning logs out of order when the query pipeline included pipes like [`unpack_json`](https://docs.victoriametrics.com/victorialogs/logsql/#unpack_json-pipe) that overwrite `_time`. See [#1360](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1360).
+* BUGFIX: [vlagent](https://docs.victoriametrics.com/victorialogs/vlagent/): hide sensitive values passed via `-remoteWrite.proxyURL` in `/metrics`, `/flags`, and startup logs. Previously these values could be exposed in plain text. See [#1320](https://github.com/VictoriaMetrics/VictoriaLogs/pull/1320).
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): sanitize markdown URLs in logs rendered with `markdown parsing` enabled, allowing only `http`, `https`, `mailto`, and `tel` schemes for active links and images. See [#1313](https://github.com/VictoriaMetrics/VictoriaLogs/pull/1313).
 * BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): improve context view highlight visibility in dark theme. The selected log entry is now highlighted with a more visible blue tint instead of barely visible gray background. See [#1196](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1196).
+* BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): fix live tab ignoring selected stream filters. See [#1342](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1342).
+* BUGFIX: [web UI](https://docs.victoriametrics.com/victorialogs/querying/#web-ui): fix stream context view where the selected log overlapped transparently with content below when scrolling. See [#1185](https://github.com/VictoriaMetrics/VictoriaLogs/issues/1185).
 
 ## [v1.50.0](https://github.com/VictoriaMetrics/VictoriaLogs/releases/tag/v1.50.0)
 
